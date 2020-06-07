@@ -1,10 +1,14 @@
 import React, {useState, useEffect} from 'react';
 import {NativeEventEmitter, NativeModules} from 'react-native';
+
 import RNDeviceRotation from 'react-native-device-rotation';
 import styled from 'styled-components';
+import PointingCircle from './component/PointingCircle';
+import LPF from 'lpf';
 
+//align-items: center;
 const Container = styled.View`
-  align-items: center;
+  width: 100%;
 `;
 const Text = styled.Text``;
 const Button = styled.View`
@@ -16,6 +20,7 @@ const Button = styled.View`
   height: 80px;
   border-radius: 10px;
 `;
+
 const Touchable = styled.TouchableOpacity``;
 let subscription = null;
 
@@ -28,11 +33,14 @@ const App = () => {
    */
   useEffect(() => {
     console.log('Initialize');
+    LPF.init([]);
+    LPF.smoothing = 0.2;
+
     const orientationEvent = new NativeEventEmitter(RNDeviceRotation);
     subscription = orientationEvent.addListener(
       'DeviceRotation',
       ({azimuth}) => {
-        setAzimuth(azimuth);
+        setAzimuth(LPF.next(azimuth));
       },
     );
     RNDeviceRotation.start();
@@ -49,10 +57,16 @@ const App = () => {
 
   useEffect(() => {}, [azimuth]);
 
+  const targetAngle = (azimuth - cAzimuth).toFixed(1);
+
+  /**
+   * 화각 - 77, 45
+   */
+
   return (
     <Container>
       <Text>
-        {(azimuth - cAzimuth).toFixed(0)}({cAzimuth.toFixed(2)})
+        {targetAngle}({cAzimuth.toFixed(2)})
       </Text>
 
       <Touchable
@@ -62,6 +76,7 @@ const App = () => {
         <Button>
           <Text>Calibration</Text>
         </Button>
+        <PointingCircle cameraId={0} angle={targetAngle} />
       </Touchable>
     </Container>
   );
