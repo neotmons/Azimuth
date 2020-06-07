@@ -22,21 +22,36 @@ const Text = styled.Text`
 const AngleOfView = [77, 45];
 
 const PointingCircle = ({cameraId = 0, angle = 0}) => {
-  const onLeft = 0;
   const CenterOfScreen = constants.width / 2 - 20;
+  const screenRate = (constants.width / AngleOfView[cameraId]).toFixed(0);
+
+  /**
+  const temp = Number(
+    CenterOfScreen -
+      (angle * (constants.width / AngleOfView[cameraId])).toFixed(0),
+  );
+   */
+  const angleTemp = 38.5;
+
   const temp = Number(
     (
-      CenterOfScreen +
-      angle * (constants.width / AngleOfView[cameraId])
+      CenterOfScreen -
+      (constants.width / AngleOfView[cameraId]) * angle
     ).toFixed(0),
   );
 
+  console.log(angle, CenterOfScreen, AngleOfView[cameraId], temp);
+
   return (
-    <Container style={{left: temp, top: 200}}>
+    <Container style={{left: temp, top: 0}}>
       <Text>{angle}</Text>
-      <Text>{temp}</Text>
     </Container>
   );
 };
+
+/**
+<Text>{temp}</Text>
+      <Text>{screenRate}</Text>
+       */
 
 export default PointingCircle;
